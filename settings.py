@@ -4,6 +4,8 @@ from dotenv import load_dotenv, find_dotenv
 if os.path.exists('.env'):
     load_dotenv(find_dotenv())
 
+TOTAL_THREADS = int(os.getenv('TOTAL_THREADS') or 12)
+
 LOCAL_MONGO_HOST = str(os.getenv('LOCAL_MONGO_HOST') or 'localhost')
 LOCAL_MONGO_PORT = int(os.getenv('LOCAL_MONGO_PORT') or 27017)
 LOCAL_MONGO_USER = str(os.getenv('LOCAL_MONGO_USER') or 'root')
