@@ -4,4 +4,4 @@
 * source ./venv/bin/activate
 * pip install -r requirements.txt
 * sudo chmod -x main.py
-* sudo nohup python3 ./main.py
+* sudo nohup python3 ./main.py &
