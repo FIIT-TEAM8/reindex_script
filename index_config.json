@@ -1,0 +1,35 @@
+{
+    "settings": {
+        "index": {
+            "number_of_shards": 3,  
+            "number_of_replicas": 2 
+        },
+        "analysis":{
+            "analyzer":{
+                "default": {
+                    "type": "standard"
+                }
+            }
+        }
+    },
+    "mappings": {
+        "dynamic": "false",
+        "properties": {
+            "title_and_html": {
+                "type": "text"
+            },
+            "published": {
+                "type": "text"
+            },
+            "region": {
+                "type": "text"
+            },
+            "language": {
+                "type": "text"
+            },
+            "keywords": {
+                "type": "text"
+            }
+        }
+    }
+}
