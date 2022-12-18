@@ -30,18 +30,18 @@ def process_documents(documents):
         article_id = str(article['_id'])
         del article['_id']
         html = article.pop('html')
-        title = article.pop('title')
-        article.pop('link')
 
-        doc = lxml.html.fromstring(title + ' ' + html)
-        clean_text = doc.text_content()
-
-        article['title_and_html'] = clean_text
+        doc = lxml.html.fromstring(html)
+        html = doc.text_content()
 
         articles.append(
-            { "index": { "_index": settings.ELASTIC_INDEX, "_id": article_id } }
+            { "update": { "_index": settings.ELASTIC_INDEX, "_id": article_id } }
         )
-        articles.append(article)
+        articles.append({
+            "doc": {
+                "html": html
+            }
+        })
 
     return articles
 
