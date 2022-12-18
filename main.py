@@ -32,6 +32,9 @@ def process_documents(documents):
         del article['_id']
         html = article.pop('html')
 
+        if html == '':
+            continue
+
         doc = lxml.html.fromstring(html)
         html = doc.text_content()
 
