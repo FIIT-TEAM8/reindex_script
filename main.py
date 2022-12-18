@@ -4,8 +4,8 @@ import time
 from pymongo import MongoClient
 from elasticsearch import Elasticsearch
 from concurrent.futures import ThreadPoolExecutor
-import html2text
 import settings
+import lxml.html
 
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -33,11 +33,8 @@ def process_documents(documents):
         title = article.pop('title')
         article.pop('link')
 
-        h = html2text.HTML2Text()
-        h.ignore_links = True
-        h.ignore_images = True
-        clean_text = h.handle(title + ' ' + html)
-        clean_text = clean_text.replace('\n', ' ')
+        doc = lxml.html.fromstring(title + ' ' + html)
+        clean_text = doc.text_content()
 
         article['title_and_html'] = clean_text
 
