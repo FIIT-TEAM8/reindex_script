@@ -36,7 +36,10 @@ def process_documents(documents):
             continue
 
         doc = lxml.html.fromstring(html)
-        html = doc.text_content()
+        # html = doc.text_content()
+        html = ''
+        for element in doc.xpath('//*[not(ancestor::style)]/text()'):
+            html += element
 
         articles.append(
             { "update": { "_index": settings.ELASTIC_INDEX, "_id": article_id } }
@@ -77,11 +80,11 @@ def index_articles(articles):
     local_es.bulk(index=settings.ELASTIC_INDEX, body=articles)
 
 
-parser = argparse.ArgumentParser()
-parser.add_argument("--starting_doc", "-s", help="index of document in MongoDB, from which updating will start")
-parser.add_argument("--update_num", "-u", help="number of documents, which will be updated")
+#parser = argparse.ArgumentParser()
+#parser.add_argument("--starting_doc", "-s", help="index of document in MongoDB, from which updating will start")
+#parser.add_argument("--update_num", "-u", help="number of documents, which will be updated")
 
-args = parser.parse_args()
+#args = parser.parse_args()
 
 total_threads = settings.TOTAL_THREADS
 
@@ -89,8 +92,8 @@ local_mongo = MongoClient(settings.LOCAL_MONGO_CONN_STRING)
 local_db = local_mongo[settings.LOCAL_MONGO_DB]
 local_collection = local_db[settings.LOCAL_MONGO_COLLECTION]
 
-start = int(args.starting_doc)
-document_count = int(args.update_num)
+start = int(settings.START_DOCUMENT)
+document_count = int(settings.UPDATE_DOCUMENTS)
 batch_size = int(document_count / total_threads) + 1
 
 with ThreadPoolExecutor(max_workers=total_threads) as executor:

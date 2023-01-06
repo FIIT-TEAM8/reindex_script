@@ -4,7 +4,9 @@ from dotenv import load_dotenv, find_dotenv
 if os.path.exists('.env'):
     load_dotenv(find_dotenv())
 
-TOTAL_THREADS = int(os.getenv('TOTAL_THREADS') or 12)
+TOTAL_THREADS = int(os.getenv('TOTAL_THREADS') or 6)
+START_DOCUMENT = int(os.getenv('START_DOCUMENT') or 0)
+UPDATE_DOCUMENTS = int(os.getenv('UPDATE_DOCUMENTS') or 100)
 
 LOCAL_MONGO_HOST = str(os.getenv('LOCAL_MONGO_HOST') or 'localhost')
 LOCAL_MONGO_PORT = int(os.getenv('LOCAL_MONGO_PORT') or 27017)
@@ -12,9 +14,9 @@ LOCAL_MONGO_USER = str(os.getenv('LOCAL_MONGO_USER') or 'root')
 LOCAL_MONGO_PASSWORD = str(os.getenv('LOCAL_MONGO_PASSWORD') or 'password')
 LOCAL_MONGO_DB = str(os.getenv('LOCAL_MONGO_DB') or 'ams')
 LOCAL_MONGO_COLLECTION = str(os.getenv('LOCAL_MONGO_COLLECTION') or 'articles')
-LOCAL_MONGO_CONN_STRING = "mongodb://{user}:{password}@{server_url}:{port}/".format(user=LOCAL_MONGO_USER, 
-                                                                        password=LOCAL_MONGO_PASSWORD, 
-                                                                        server_url=LOCAL_MONGO_HOST, 
+LOCAL_MONGO_CONN_STRING = "mongodb://{user}:{password}@{server_url}:{port}/".format(user=LOCAL_MONGO_USER,
+                                                                        password=LOCAL_MONGO_PASSWORD,
+                                                                        server_url=LOCAL_MONGO_HOST,
                                                                         port=LOCAL_MONGO_PORT)
 
 LOCAL_ELASTIC_HOST = str(os.getenv('ELASTIC_HOST') or 'localhost')
