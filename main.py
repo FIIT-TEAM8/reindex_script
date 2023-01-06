@@ -6,6 +6,7 @@ from elasticsearch import Elasticsearch
 from concurrent.futures import ThreadPoolExecutor
 import settings
 import lxml.html
+import argparse
 
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -30,18 +31,24 @@ def process_documents(documents):
         article_id = str(article['_id'])
         del article['_id']
         html = article.pop('html')
-        title = article.pop('title')
-        article.pop('link')
 
-        doc = lxml.html.fromstring(title + ' ' + html)
-        clean_text = doc.text_content()
+        if html == '':
+            continue
 
-        article['title_and_html'] = clean_text
+        doc = lxml.html.fromstring(html)
+        # html = doc.text_content()
+        html = ''
+        for element in doc.xpath('//*[not(ancestor::style)]/text()'):
+            html += element
 
         articles.append(
-            { "index": { "_index": settings.ELASTIC_INDEX, "_id": article_id } }
+            { "update": { "_index": settings.ELASTIC_INDEX, "_id": article_id } }
         )
-        articles.append(article)
+        articles.append({
+            "doc": {
+                "html": html
+            }
+        })
 
     return articles
 
@@ -73,20 +80,27 @@ def index_articles(articles):
     local_es.bulk(index=settings.ELASTIC_INDEX, body=articles)
 
 
+#parser = argparse.ArgumentParser()
+#parser.add_argument("--starting_doc", "-s", help="index of document in MongoDB, from which updating will start")
+#parser.add_argument("--update_num", "-u", help="number of documents, which will be updated")
+
+#args = parser.parse_args()
+
 total_threads = settings.TOTAL_THREADS
 
 local_mongo = MongoClient(settings.LOCAL_MONGO_CONN_STRING)
 local_db = local_mongo[settings.LOCAL_MONGO_DB]
 local_collection = local_db[settings.LOCAL_MONGO_COLLECTION]
 
-document_count = local_collection.estimated_document_count()
+start = int(settings.START_DOCUMENT)
+document_count = int(settings.UPDATE_DOCUMENTS)
 batch_size = int(document_count / total_threads) + 1
 
 with ThreadPoolExecutor(max_workers=total_threads) as executor:
     document_futures = []
 
     for batch_index in range(total_threads):
-        skip = batch_index * batch_size
+        skip = start + batch_index * batch_size
         limit = batch_size
         document_futures.append(executor.submit(retrieve_documents, skip, limit))
 
