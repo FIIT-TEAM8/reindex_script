@@ -6,7 +6,6 @@ from elasticsearch import Elasticsearch
 from concurrent.futures import ThreadPoolExecutor
 import settings
 import lxml.html
-import argparse
 
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
