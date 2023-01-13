@@ -1,15 +1,16 @@
 import os
+import re
 import json
 import time
 from pymongo import MongoClient
 from elasticsearch import Elasticsearch
 from concurrent.futures import ThreadPoolExecutor
 import settings
-import lxml.html
 
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
+pattern = r'\b([A-Z][a-z]+)\b'
 
 def retrieve_documents(skip, limit):
     print('retrieving')
@@ -34,11 +35,7 @@ def process_documents(documents):
         if html == '':
             continue
 
-        doc = lxml.html.fromstring(html)
-        # html = doc.text_content()
-        html = ''
-        for element in doc.xpath('//*[not(ancestor::style)]/text()'):
-            html += element
+        html = ' '.join(re.findall(pattern, html))
 
         articles.append(
             { "update": { "_index": settings.ELASTIC_INDEX, "_id": article_id } }
